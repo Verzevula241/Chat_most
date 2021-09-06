@@ -53,3 +53,39 @@ export interface Chat
         createdAt?: string;
     }[];
 }
+
+
+export interface ChatsElement {
+    adminChatName: string;
+    id: number;
+    chatType: number;
+    name: string;
+    lastMessageId: number;
+    creatorId: number;
+    createTime: string;
+    modifyUserId: number;
+    modifyTime: string;
+    isDeleted: boolean;
+    chatUsers: Array<{
+        chatId: number;
+        userId: number;
+        isAdmin: boolean;
+    }>;
+    lastMessage: LastMessage;
+}
+
+interface LastMessage {
+    id: number;
+    chatId: number;
+    userId: number;
+    text: string;
+    quoteMessageId: number;
+    dateTime: string;
+    messageType: number;
+    fileSize: number;
+    contentType: any;
+    isRead: boolean;
+    chat: any;
+    user: any;
+    quoteMessage: any;
+}
