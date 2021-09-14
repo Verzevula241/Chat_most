@@ -4,32 +4,35 @@
 import { Component, OnInit } from '@angular/core';
 import { HubConnection } from '@microsoft/signalr';
 import * as signalR from '@microsoft/signalr';
+import VarObject from 'app/services/var.objects';
 
 @Component({
     selector: 'app-signal-chat',
     templateUrl: 'chat.component.html'
 })
-export class SignalChatComponent implements OnInit {
+export class ChatComponent implements OnInit {
     public async: any;
-    private baseUrl = 'http://ng-test.dmsoft.ru';
     message = 'test message for you';
     messages: string[] = [];
-
+    token = localStorage['token'];
     private _hubConnection: HubConnection | undefined;
-    constructor() { }
+    constructor(private _variables: VarObject) { }
 
 
     ngOnInit(): void {
-        const token = localStorage['token'];
         this._hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(this.baseUrl + '/signalr/close', {
-                accessTokenFactory: () => token,
+            .withUrl(this._variables.baseUrl + '/signalr/chat', {
+                accessTokenFactory: () => this.token,
             })
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
         this._hubConnection.start().catch(err => console.error(err.toString()));
+
+        this._hubConnection.on('connected', (data) => {
+            console.table(data.dashboard);
+        });
 
         this._hubConnection.on('message', (data)=> {
             console.log('open hub message:');
@@ -52,7 +55,7 @@ export class SignalChatComponent implements OnInit {
                 body: JSON.stringify(data)
             });
 
-        postMessage(this.baseUrl + '/api/test/messsage/close', { message: `Sent: ${this.message}` }).then((response) => {
+        postMessage(this._variables.baseUrl + '/api/test/messsage/close', { message: `Sent: ${this.message}` }).then((response) => {
             console.log(response);
         }, (response)=> {
             console.log(response);
