@@ -4,6 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
+import  VarObject  from 'app/services/var.objects';
 
 @Injectable()
 export class AuthService
@@ -15,7 +16,8 @@ export class AuthService
      */
     constructor(
         private _httpClient: HttpClient,
-        private _userService: UserService
+        private _userService: UserService,
+        private _http: VarObject
     )
     {
     }
@@ -66,7 +68,7 @@ export class AuthService
      *
      * @param credentials
      */
-    signIn(credentials: { email: string; password: string }): Observable<any>
+    signIn(credentials: { login: string; password: string }): Observable<any>
     {
         // Throw error, if the user is already logged in
         if ( this._authenticated )
@@ -74,11 +76,11 @@ export class AuthService
             return throwError('User is already logged in.');
         }
 
-        return this._httpClient.post('api/auth/sign-in', credentials).pipe(
+        return this._httpClient.post(this._http.baseUrl + this._http.token, credentials).pipe(
             switchMap((response: any) => {
 
                 // Store the access token in the local storage
-                this.accessToken = response.accessToken;
+                this.accessToken = response.token;
 
                 // Set the authenticated flag to true
                 this._authenticated = true;
@@ -95,33 +97,34 @@ export class AuthService
     /**
      * Sign in using the access token
      */
-    signInUsingToken(): Observable<any>
-    {
-        // Renew token
-        return this._httpClient.post('api/auth/refresh-access-token', {
-            accessToken: this.accessToken
-        }).pipe(
-            catchError(() =>
+    // signInUsingToken(): Observable<any>
+    // {
+    //     // Renew token
+    //     // return this._httpClient.post('api/auth/refresh-access-token', {
+    //     //     accessToken: this.accessToken
+    //     // }).pipe(
+    //     //     catchError(() =>
 
-                // Return false
-                of(false)
-            ),
-            switchMap((response: any) => {
+    //     //         // Return false
+    //     //         of(false)
+    //     //     ),
+    //     //     switchMap((response: any) => {
 
-                // Store the access token in the local storage
-                this.accessToken = response.accessToken;
+    //     //         // Store the access token in the local storage
+    //     //         this.accessToken = response.accessToken;
 
-                // Set the authenticated flag to true
-                this._authenticated = true;
+    //     //         // Set the authenticated flag to true
+    //     //         this._authenticated = true;
 
-                // Store the user on the user service
-                this._userService.user = response.user;
+    //     //         // Store the user on the user service
+    //     //         this._userService.user = response.user;
 
-                // Return true
-                return of(true);
-            })
-        );
-    }
+    //     //         // Return true
+    //     //         return of(true);
+    //     //     })
+    //     // );
+    //     return
+    // }
 
     /**
      * Sign out
@@ -131,12 +134,46 @@ export class AuthService
         // Remove the access token from the local storage
         localStorage.removeItem('accessToken');
 
+        this.deleteCookie('.AspNetCore.Cookies');
+
         // Set the authenticated flag to false
         this._authenticated = false;
 
         // Return the observable
         return of(true);
     }
+
+
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    deleteCookie(name: any) {
+        this.setCookie(name, '', {
+          'max-age': -1
+        });
+      }
+
+
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+      setCookie(name: string | number | boolean, value: string | number | boolean, options: any = {}) {
+
+        options = {
+          path: '/',
+          // при необходимости добавьте другие значения по умолчанию
+          ...options
+        };
+        if (options.expires instanceof Date) {
+          options.expires = options.expires.toUTCString();
+        }
+        let updatedCookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+        // eslint-disable-next-line guard-for-in
+        for (const optionKey in options) {
+          updatedCookie += '; ' + optionKey;
+          const optionValue = options[optionKey];
+          if (optionValue !== true) {
+            updatedCookie += '=' + optionValue;
+          }
+        }
+        document.cookie = updatedCookie;
+      }
 
     /**
      * Sign up
@@ -182,6 +219,7 @@ export class AuthService
         }
 
         // If the access token exists and it didn't expire, sign in using it
-        return this.signInUsingToken();
+        // return this.signInUsingToken();
+        return of(true);
     }
 }
