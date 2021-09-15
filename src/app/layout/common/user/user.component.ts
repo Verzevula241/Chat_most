@@ -85,11 +85,15 @@ export class UserComponent implements OnInit, OnDestroy
             return;
         }
 
-        // Update the user
-        // this._userService.update({
-        //     ...this.user,
-        //     status
-        // }).subscribe();
+         // Subscribe to user changes
+         this._userService.user$
+         .pipe(takeUntil(this._unsubscribeAll))
+         .subscribe((user: UsersElement) => {
+             this.user = user;
+
+             // Mark for check
+             this._changeDetectorRef.markForCheck();
+         });
     }
 
     /**

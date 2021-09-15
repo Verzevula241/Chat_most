@@ -14,7 +14,7 @@ export class ChatComponent implements OnInit {
     public async: any;
     message = 'test message for you';
     messages: string[] = [];
-    token = localStorage['token'];
+    token = localStorage['accessToken'];
     private _hubConnection: HubConnection | undefined;
     constructor(private _variables: VarObject) { }
 

@@ -21,7 +21,7 @@
         ></span>
     </span>
 </button> -->
-    <button mat-button [matMenuTriggerFor]="userActions"><img class="w-7 h-7 rounded-full"
+    <button mat-button [matMenuTriggerFor]="userActions" *ngIf="showAvatar && user"><img class="w-7 h-7 rounded-full"
             *ngIf="showAvatar && user.userpic" [src]="user.userpic">
         <mat-icon *ngIf="!showAvatar || !user.userpic" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
         <span class="absolute right-0 bottom-0 w-2 h-2 rounded-full" [ngClass]="{'mr-px mb-px': !showAvatar || !user.userpic,
@@ -34,7 +34,7 @@
 </div>
 <mat-menu xPosition="after" yPosition="below" #userActions="matMenu">
     <button mat-menu-item>
-        <span class="flex flex-col leading-none">
+        <span class="flex flex-col leading-none" *ngIf="showAvatar && user">
             <span>Вы ввошли как </span>
             <span class="mt-1.5 text-md font-medium">{{user.email}}</span>
         </span>
