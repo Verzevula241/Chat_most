@@ -8,6 +8,7 @@ import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { UsersElement } from 'app/interface/all.interface';
 
 @Component({
     selector     : 'futuristic-layout',
@@ -18,7 +19,7 @@ export class FuturisticLayoutComponent implements OnInit, OnDestroy
 {
     isScreenSmall: boolean;
     navigation: Navigation;
-    user: User;
+    user: UsersElement;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -66,7 +67,7 @@ export class FuturisticLayoutComponent implements OnInit, OnDestroy
         // Subscribe to the user service
         this._userService.user$
             .pipe((takeUntil(this._unsubscribeAll)))
-            .subscribe((user: User) => {
+            .subscribe((user: UsersElement) => {
                 this.user = user;
             });
 

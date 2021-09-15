@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { UsersElement } from 'app/interface/all.interface';
+import { HttpService2 } from 'app/services/http.service';
 
 @Component({
     selector       : 'user',
@@ -20,7 +22,7 @@ export class UserComponent implements OnInit, OnDestroy
     /* eslint-enable @typescript-eslint/naming-convention */
 
     @Input() showAvatar: boolean = true;
-    user: User;
+    user: UsersElement;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -30,7 +32,8 @@ export class UserComponent implements OnInit, OnDestroy
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _http: HttpService2
     )
     {
     }
@@ -47,7 +50,7 @@ export class UserComponent implements OnInit, OnDestroy
         // Subscribe to user changes
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((user: User) => {
+            .subscribe((user: UsersElement) => {
                 this.user = user;
 
                 // Mark for check
@@ -83,10 +86,10 @@ export class UserComponent implements OnInit, OnDestroy
         }
 
         // Update the user
-        this._userService.update({
-            ...this.user,
-            status
-        }).subscribe();
+        // this._userService.update({
+        //     ...this.user,
+        //     status
+        // }).subscribe();
     }
 
     /**
@@ -95,5 +98,7 @@ export class UserComponent implements OnInit, OnDestroy
     signOut(): void
     {
         this._router.navigate(['/sign-out']);
+        this._http.logOut().subscribe();
+
     }
 }
